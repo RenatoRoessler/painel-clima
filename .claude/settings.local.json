@@ -7,7 +7,26 @@
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
       "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?city=Tokyo\")",
-      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?lat=-23.5505&lon=-46.6333\")"
+      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?lat=-23.5505&lon=-46.6333\")",
+      "WebSearch",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(npm init:*)",
+      "Bash(timeout 10 npx vite --version)",
+      "Bash(timeout 15 npx vite --port 5173)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(kill %1)",
+      "Bash(npm --prefix ./frontend run dev -- --port 5173)",
+      "Bash(curl -s http://localhost:3000/status)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/status)",
+      "Bash(curl -s -o /dev/null -w \"Status: %{http_code}\" http://localhost:5173/)",
+      "Bash(npx kill-port:*)",
+      "Bash(netstat -ano)",
+      "Bash(xargs -I{} taskkill /PID {} /F)",
+      "Bash(ls C:/curso/painel-clima/backend/*.ts C:/curso/painel-clima/backend/*.js C:/curso/painel-clima/backend/*.json)",
+      "Bash(npx vite:*)"
     ]
   }
 }
