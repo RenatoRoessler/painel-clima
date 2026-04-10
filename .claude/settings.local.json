@@ -7,7 +7,21 @@
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
       "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?city=Tokyo\")",
-      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?lat=-23.5505&lon=-46.6333\")"
+      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" \"http://localhost:3000/api/weather?lat=-23.5505&lon=-46.6333\")",
+      "Bash(curl -sv \"http://localhost:3000/api/weather?city=Curitiba\")",
+      "Bash(node -e \"const r = require\\('./src/routes/weather.js'\\); console.log\\(r\\)\")",
+      "Bash(npx tsx:*)",
+      "Bash(pkill -f \"tsx watch src/server.ts\")",
+      "Bash(curl -s \"http://localhost:3000/api/weather?city=Curitiba\")",
+      "Bash(curl -s \"http://localhost:3000/api/weather?lat=-25.43&lon=-49.27\")",
+      "Bash(curl -sv \"http://localhost:3000/api/weather?city=CidadeQueNaoExisteXYZ123\")",
+      "Bash(curl -sv \"http://localhost:3000/api/weather\")",
+      "Bash(curl -s \"http://localhost:3000/status\")",
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(npm run:*)",
+      "Bash(grep -r \"comment\\\\|//\" /c/curso/painel-clima/frontend/src --include=\"*.tsx\" --include=\"*.ts\")"
     ]
   }
 }

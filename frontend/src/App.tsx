@@ -1,58 +1,91 @@
-import { useEffect, useState } from "react";
+import { useCallback, useRef } from 'react';
+import { useWeather } from './hooks/useWeather';
+import { useGeolocation } from './hooks/useGeolocation';
+import { getTemperatureGradient } from './utils/weatherUtils';
+import { SearchBar } from './components/SearchBar/SearchBar';
+import { CurrentWeather } from './components/CurrentWeather/CurrentWeather';
+import { HourlyChart } from './components/HourlyChart/HourlyChart';
+import { WeeklyForecast } from './components/WeeklyForecast/WeeklyForecast';
+import {
+  AppWrapper,
+  ContentWrapper,
+  Header,
+  AppTitle,
+  ErrorBox,
+  ErrorTitle,
+  ErrorMessage,
+  RetryButton,
+} from './App.styles';
 
-type BackendStatus = {
-  status: string;
-  service: string;
-  timestamp: string;
-};
+const DEFAULT_GRADIENT = 'linear-gradient(135deg, #0d47a1, #00bcd4)';
 
-function App() {
-  const [data, setData] = useState<BackendStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function App() {
+  const { data, loading, error, search } = useWeather();
+  const { getPosition, loading: geoLoading } = useGeolocation();
+  const lastSearchRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/status");
+  const gradient = data
+    ? getTemperatureGradient(data.current.temperature)
+    : DEFAULT_GRADIENT;
 
-        if (!response.ok) {
-          throw new Error(`Erro ao consultar backend: ${response.status}`);
-        }
+  const handleSearch = useCallback(
+    (city: string) => {
+      lastSearchRef.current = () => search({ city });
+      search({ city });
+    },
+    [search]
+  );
 
-        const json = (await response.json()) as BackendStatus;
-        setData(json);
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Erro inesperado ao consultar backend";
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleGeolocate = useCallback(async () => {
+    try {
+      const { lat, lon } = await getPosition();
+      lastSearchRef.current = () => search({ lat, lon });
+      search({ lat, lon });
+    } catch {
+      // error handled by useGeolocation
+    }
+  }, [getPosition, search]);
 
-    fetchStatus();
+  const handleRetry = useCallback(() => {
+    if (lastSearchRef.current) lastSearchRef.current();
   }, []);
 
+  const isLoading = loading || geoLoading;
+
   return (
-    <main style={{ fontFamily: "Arial, sans-serif", padding: "24px" }}>
-      <h1>Status do Backend</h1>
-      {loading && <p>Carregando...</p>}
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {!loading && !error && (
-        <pre
-          style={{
-            background: "#f4f4f4",
-            borderRadius: "8px",
-            padding: "12px",
-            overflowX: "auto",
-          }}
-        >
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      )}
-    </main>
+    <AppWrapper $gradient={gradient}>
+      <ContentWrapper>
+        <Header>
+          <AppTitle>Painel de Clima</AppTitle>
+          <SearchBar
+            onSearch={handleSearch}
+            onGeolocate={handleGeolocate}
+            loading={isLoading}
+          />
+        </Header>
+
+        {error && (
+          <ErrorBox>
+            <ErrorTitle>
+              {error === 'not_found' ? '🌍 Cidade não encontrada' : '⚠️ Erro ao buscar dados'}
+            </ErrorTitle>
+            <ErrorMessage>
+              {error === 'not_found'
+                ? 'Não encontramos nenhuma cidade com esse nome. Verifique a grafia e tente novamente.'
+                : 'Houve um problema ao buscar os dados climáticos. Por favor, tente novamente.'}
+            </ErrorMessage>
+            <RetryButton onClick={handleRetry}>Tentar novamente</RetryButton>
+          </ErrorBox>
+        )}
+
+        {(isLoading || data) && !error && (
+          <>
+            <CurrentWeather data={data} loading={isLoading} />
+            <HourlyChart data={data} loading={isLoading} />
+            <WeeklyForecast data={data} loading={isLoading} />
+          </>
+        )}
+      </ContentWrapper>
+    </AppWrapper>
   );
 }
-
-export default App;
